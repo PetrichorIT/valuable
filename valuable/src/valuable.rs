@@ -394,12 +394,9 @@ impl Valuable for SocketAddr {
     }
 }
 
-static SOCKET_ADDR_FIELDS: &[NamedField<'static>] =
-    &[NamedField::new("addr"), NamedField::new("port")];
-
 impl Structable for SocketAddrV4 {
     fn definition(&self) -> StructDef<'_> {
-        StructDef::new_static("SocketAddrV4", Fields::Named(SOCKET_ADDR_FIELDS))
+        StructDef::new_static("SocketAddrV4", Fields::Unnamed(1))
     }
 }
 
@@ -409,16 +406,13 @@ impl Valuable for SocketAddrV4 {
     }
 
     fn visit(&self, v: &mut dyn Visit) {
-        v.visit_named_fields(&NamedValues::new(
-            SOCKET_ADDR_FIELDS,
-            &[self.ip().as_value(), Value::U16(self.port())],
-        ));
+        v.visit_unnamed_fields(&[self.to_string().as_value()]);
     }
 }
 
 impl Structable for SocketAddrV6 {
     fn definition(&self) -> StructDef<'_> {
-        StructDef::new_static("SocketAddrV6", Fields::Named(SOCKET_ADDR_FIELDS))
+        StructDef::new_static("SocketAddrV6", Fields::Unnamed(1))
     }
 }
 
@@ -428,10 +422,7 @@ impl Valuable for SocketAddrV6 {
     }
 
     fn visit(&self, v: &mut dyn Visit) {
-        v.visit_named_fields(&NamedValues::new(
-            SOCKET_ADDR_FIELDS,
-            &[self.ip().as_value(), Value::U16(self.port())],
-        ));
+        v.visit_unnamed_fields(&[self.to_string().as_value()]);
     }
 }
 
@@ -452,7 +443,7 @@ impl Valuable for Duration {
     }
     fn visit(&self, v: &mut dyn Visit) {
         v.visit_named_fields(&NamedValues::new(
-            SOCKET_ADDR_FIELDS,
+            DURATION_FIELDS,
             &[Value::U64(self.as_secs()), Value::U32(self.subsec_nanos())],
         ));
     }
