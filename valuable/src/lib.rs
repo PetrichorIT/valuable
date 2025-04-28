@@ -135,6 +135,9 @@ pub use mappable::Mappable;
 mod named_values;
 pub use named_values::NamedValues;
 
+mod owned;
+pub use owned::*;
+
 mod slice;
 pub use slice::Slice;
 

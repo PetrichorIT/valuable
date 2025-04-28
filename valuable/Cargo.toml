@@ -33,6 +33,7 @@ std = ["alloc"]
 alloc = []
 
 [dependencies]
+indexmap = "1.9.3"
 valuable-derive = { version = "=0.1.1", optional = true, path = "../valuable-derive" }
 
 [dev-dependencies]

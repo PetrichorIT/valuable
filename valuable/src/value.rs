@@ -1,4 +1,6 @@
-use crate::{Enumerable, Listable, Mappable, Structable, Tuplable, Valuable, Visit};
+use crate::{
+    into_owned, Enumerable, Listable, Mappable, Structable, Tuplable, Valuable, ValueOwned, Visit,
+};
 
 use core::fmt;
 
@@ -404,6 +406,15 @@ value! {
     /// let v = Value::Tuplable(&my_tuple);
     /// ```
     Tuplable(&'a dyn Tuplable),
+}
+
+impl Value<'_> {
+    /// Transforms the current value into an owned instance.
+    ///
+    /// This does copy values.
+    pub fn as_owned(&self) -> ValueOwned {
+        into_owned(self)
+    }
 }
 
 impl Valuable for Value<'_> {

@@ -1,6 +1,7 @@
-use crate::{Slice, Value, Visit};
+use crate::{Fields, NamedField, NamedValues, Slice, StructDef, Structable, Value, Visit};
 
 use core::fmt;
+use core::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 use core::num::Wrapping;
 
 /// A type that can be converted to a [`Value`].
@@ -335,5 +336,88 @@ impl fmt::Debug for dyn Valuable + '_ {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         let value = self.as_value();
         value.fmt(fmt)
+    }
+}
+
+impl Valuable for IpAddr {
+    fn as_value(&self) -> Value<'_> {
+        match self {
+            IpAddr::V4(addr) => addr.as_value(),
+            IpAddr::V6(addr) => addr.as_value(),
+        }
+    }
+    fn visit(&self, visit: &mut dyn Visit) {
+        visit.visit_value(self.as_value());
+    }
+}
+
+impl Valuable for Ipv4Addr {
+    fn as_value(&self) -> Value<'_> {
+        Value::U32(self.to_bits())
+    }
+    fn visit(&self, visit: &mut dyn Visit) {
+        visit.visit_value(self.as_value());
+    }
+}
+
+impl Valuable for Ipv6Addr {
+    fn as_value(&self) -> Value<'_> {
+        Value::U128(self.to_bits())
+    }
+    fn visit(&self, visit: &mut dyn Visit) {
+        visit.visit_value(self.as_value());
+    }
+}
+
+impl Valuable for SocketAddr {
+    fn as_value(&self) -> Value<'_> {
+        match self {
+            SocketAddr::V4(addr) => addr.as_value(),
+            SocketAddr::V6(addr) => addr.as_value(),
+        }
+    }
+    fn visit(&self, visit: &mut dyn Visit) {
+        visit.visit_value(self.as_value());
+    }
+}
+
+static SOCKET_ADDR_FIELDS: &[NamedField<'static>] =
+    &[NamedField::new("addr"), NamedField::new("port")];
+
+impl Structable for SocketAddrV4 {
+    fn definition(&self) -> StructDef<'_> {
+        StructDef::new_static("SocketAddrV4", Fields::Named(SOCKET_ADDR_FIELDS))
+    }
+}
+
+impl Valuable for SocketAddrV4 {
+    fn as_value(&self) -> Value<'_> {
+        Value::Structable(self)
+    }
+
+    fn visit(&self, v: &mut dyn Visit) {
+        v.visit_named_fields(&NamedValues::new(
+            SOCKET_ADDR_FIELDS,
+            &[self.ip().as_value(), Value::U16(self.port())],
+        ));
+    }
+}
+
+impl Structable for SocketAddrV6 {
+    fn definition(&self) -> StructDef<'_> {
+        StructDef::new_static("SocketAddrV6", Fields::Named(SOCKET_ADDR_FIELDS))
+    }
+}
+
+impl Valuable for SocketAddrV6 {
+    fn as_value(&self) -> Value<'_> {
+        Value::Structable(self)
+    }
+
+    fn visit(&self, v: &mut dyn Visit) {
+        v.visit_named_fields(&NamedValues::new(
+            SOCKET_ADDR_FIELDS,
+            &[self.ip().as_value(), Value::U16(self.port())],
+        ));
     }
 }
