@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
 
+use core::ops::{Deref, DerefMut};
 use indexmap::IndexMap;
 use std::path::PathBuf;
 
@@ -60,9 +61,22 @@ impl Number {
 
 pub type Sequence = Vec<ValueOwned>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Mapping {
     pub map: IndexMap<String, ValueOwned>,
+}
+
+impl Deref for Mapping {
+    type Target = IndexMap<String, ValueOwned>;
+    fn deref(&self) -> &Self::Target {
+        &self.map
+    }
+}
+
+impl DerefMut for Mapping {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.map
+    }
 }
 
 #[derive(Debug, Clone)]
