@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use crate::{NamedValues, Valuable, Value, Visit};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ValueOwned {
     Unit,
     Number(Number),
@@ -20,7 +20,16 @@ pub enum ValueOwned {
     Enum(Box<EnumValue>),
 }
 
-#[derive(Debug, Clone)]
+impl ValueOwned {
+    pub fn as_mapping(&self) -> Option<&Mapping> {
+        match self {
+            ValueOwned::Mapping(mapping) => Some(mapping),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum Number {
     I8(i8),
     I16(i16),
@@ -61,7 +70,7 @@ impl Number {
 
 pub type Sequence = Vec<ValueOwned>;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct Mapping {
     pub map: IndexMap<String, ValueOwned>,
 }
@@ -79,7 +88,7 @@ impl DerefMut for Mapping {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct EnumValue {
     pub variant: String,
     pub value: ValueOwned,
