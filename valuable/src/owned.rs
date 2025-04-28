@@ -151,7 +151,12 @@ impl Visit for Visitor {
                 if structable.definition().fields().is_unnamed() {
                     let mut visit = VisitList { list: Vec::new() };
                     structable.visit(&mut visit);
-                    self.value = ValueOwned::Sequence(visit.list);
+
+                    if visit.list.len() == 1 {
+                        self.value = visit.list.remove(0);
+                    } else {
+                        self.value = ValueOwned::Sequence(visit.list);
+                    }
                 } else {
                     let mut visit = VisitMap {
                         map: IndexMap::new(),
