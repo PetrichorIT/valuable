@@ -3,6 +3,7 @@ use crate::{Fields, NamedField, NamedValues, Slice, StructDef, Structable, Value
 use core::fmt;
 use core::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 use core::num::Wrapping;
+use core::time::Duration;
 
 /// A type that can be converted to a [`Value`].
 ///
@@ -418,6 +419,29 @@ impl Valuable for SocketAddrV6 {
         v.visit_named_fields(&NamedValues::new(
             SOCKET_ADDR_FIELDS,
             &[self.ip().as_value(), Value::U16(self.port())],
+        ));
+    }
+}
+
+// std::time
+
+static DURATION_FIELDS: &[NamedField<'static>] =
+    &[NamedField::new("secs"), NamedField::new("nanos")];
+
+impl Structable for Duration {
+    fn definition(&self) -> StructDef<'_> {
+        StructDef::new_static("Duration", Fields::Named(DURATION_FIELDS))
+    }
+}
+
+impl Valuable for Duration {
+    fn as_value(&self) -> Value<'_> {
+        Value::Structable(self)
+    }
+    fn visit(&self, v: &mut dyn Visit) {
+        v.visit_named_fields(&NamedValues::new(
+            SOCKET_ADDR_FIELDS,
+            &[Value::U64(self.as_secs()), Value::U32(self.subsec_nanos())],
         ));
     }
 }
