@@ -1,12 +1,11 @@
 #![allow(missing_docs)]
 
 use indexmap::IndexMap;
-use std::error::Error as StdError;
 use std::path::PathBuf;
 
 use crate::{NamedValues, Valuable, Value, Visit};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ValueOwned {
     Unit,
     Number(Number),
@@ -14,13 +13,13 @@ pub enum ValueOwned {
     Char(char),
     String(String),
     Path(PathBuf),
-    Error(Box<dyn StdError>),
+    Error,
     Sequence(Sequence),
     Mapping(Mapping),
     Enum(Box<EnumValue>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Number {
     I8(i8),
     I16(i16),
@@ -61,12 +60,12 @@ impl Number {
 
 pub type Sequence = Vec<ValueOwned>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Mapping {
     pub map: IndexMap<String, ValueOwned>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EnumValue {
     pub variant: String,
     pub value: ValueOwned,
