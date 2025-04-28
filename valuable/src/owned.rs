@@ -148,11 +148,17 @@ impl Visit for Visitor {
             }
 
             Value::Structable(structable) => {
-                let mut visit = VisitMap {
-                    map: IndexMap::new(),
-                };
-                structable.visit(&mut visit);
-                self.value = ValueOwned::Mapping(Mapping { map: visit.map });
+                if structable.definition().fields().is_unnamed() {
+                    let mut visit = VisitList { list: Vec::new() };
+                    structable.visit(&mut visit);
+                    self.value = ValueOwned::Sequence(visit.list);
+                } else {
+                    let mut visit = VisitMap {
+                        map: IndexMap::new(),
+                    };
+                    structable.visit(&mut visit);
+                    self.value = ValueOwned::Mapping(Mapping { map: visit.map });
+                }
             }
 
             Value::Enumerable(enumerable) => {
