@@ -352,21 +352,33 @@ impl Valuable for IpAddr {
     }
 }
 
+impl Structable for Ipv4Addr {
+    fn definition(&self) -> StructDef<'_> {
+        StructDef::new_static("Ipv4Addr", Fields::Unnamed(1))
+    }
+}
+
 impl Valuable for Ipv4Addr {
     fn as_value(&self) -> Value<'_> {
-        Value::U32(self.to_bits())
+        Value::Structable(self)
     }
-    fn visit(&self, visit: &mut dyn Visit) {
-        visit.visit_value(self.as_value());
+    fn visit(&self, v: &mut dyn Visit) {
+        v.visit_unnamed_fields(&[self.to_string().as_value()]);
+    }
+}
+
+impl Structable for Ipv6Addr {
+    fn definition(&self) -> StructDef<'_> {
+        StructDef::new_static("Ipv6Addr", Fields::Unnamed(1))
     }
 }
 
 impl Valuable for Ipv6Addr {
     fn as_value(&self) -> Value<'_> {
-        Value::U128(self.to_bits())
+        Value::Structable(self)
     }
-    fn visit(&self, visit: &mut dyn Visit) {
-        visit.visit_value(self.as_value());
+    fn visit(&self, v: &mut dyn Visit) {
+        v.visit_unnamed_fields(&[self.to_string().as_value()]);
     }
 }
 
